@@ -10,7 +10,7 @@ const port = process.env.PORT || 3001;
 
 // Setting paths
 const staticpath = path.join(__dirname, "../public");
-const templatepath = path.join(__dirname, "../templates/views");
+const rootpath = path.join(__dirname, "../"); // Assuming root for views
 const partialpath = path.join(__dirname, "../templates/partials");
 
 // Middleware
@@ -19,17 +19,23 @@ app.use('/css', express.static(path.join(__dirname, "../node_modules/bootstrap/d
 app.use('/js', express.static(path.join(__dirname, "../node_modules/bootstrap/dist/js")));
 app.use('/jq', express.static(path.join(__dirname, "../node_modules/jquery/dist/")));
 app.use(express.static(staticpath));
-app.set("view engine", "hbs");
-app.set("views", templatepath);
-hbs.registerPartials(partialpath);
 
+// View engine setup
+app.set("view engine", "hbs");
+app.set("views", rootpath);
+hbs.registerPartials(partialpath);
 
 // Routing
 app.get("/", (req, res) => {
     res.render("index");
 });
+
 app.get("/rooms", (req, res) => {
     res.render("rooms");
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
 });
 
 app.post("/contact", async (req, res) => {
@@ -51,11 +57,6 @@ app.get('/usermessages', async (req, res) => {
     }
 });
 
-app.get("/login", (req, res) => {
-    res.render("login");
-});
-
-// Route to handle login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     // Implement your authentication logic here
@@ -78,49 +79,4 @@ const start = async () => {
     }
 };
 
-var TxtType = function(el, toRotate, period) {
-        this.toRotate = toRotate;
-        this.el = el;
-        this.loopNum = 0;
-        this.period = parseInt(period, 10) || 2000;
-        this.txt = '';
-        this.tick();
-        this.isDeleting = false;
-    };
-
-    TxtType.prototype.tick = function() {
-        var i = this.loopNum % this.toRotate.length;
-        var fullTxt = this.toRotate[i];
-
-        if (this.isDeleting) {
-        this.txt = fullTxt.substring(0, this.txt.length - 1);
-        } else {
-        this.txt = fullTxt.substring(0, this.txt.length + 1);
-        }
-
-        this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
-
-        var that = this;
-        var delta = 200 - Math.random() * 100;
-
-        if (this.isDeleting) { delta /= 2; }
-
-        if (!this.isDeleting && this.txt === fullTxt) {
-        delta = this.period;
-        this.isDeleting = true;
-        } else if (this.isDeleting && this.txt === '') {
-        this.isDeleting = false;
-        this.loopNum++;
-        delta = 500;
-        }
-
-        setTimeout(function() {
-        that.tick();
-        }, delta);
-    };
-
-    
-
-
-    
-start(); // Call the start function to initialize the app
+start();
